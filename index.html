@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>廖佑軒 LIAO YOU-XUAN ｜ 技術轉譯者 × 技職教育推廣者 × 地方實踐者</title>
+  <meta name="description" content="廖佑軒的個人品牌網站。以技為本，以人為念。結合創客科技教育、技職教育推廣、數位培力與地方實踐，讓技術成為連結人與人、地方與未來的力量。">
+
+  <!-- Google Fonts: Noto Sans TC & Noto Serif TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Tailwind Custom Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandYellow: '#F4C542',
+            brandNavy: '#132535',
+            brandTeal: '#2BA99B',
+            brandCream: '#F7F6F2',
+            brandDark: '#333333',
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            serif: ['"Noto Serif TC"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #F7F6F2;
+      color: #333333;
+      font-family: 'Noto Sans TC', sans-serif;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background-color: rgba(244, 197, 66, 0.4);
+      color: #132535;
+    }
+
+    /* Custom Fade-in & Slide-up animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    .animate-slideUp {
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="relative antialiased">
+
+  <!-- Toast Notification (Zero Native Alerts) -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden flex items-center gap-3 bg-[#132535] text-white px-5 py-3 rounded-xl shadow-2xl border border-brandYellow/40 animate-slideUp">
+    <i data-lucide="check-circle-2" class="w-5 h-5 text-brandYellow shrink-0"></i>
+    <span id="toast-message" class="text-sm font-medium">通知訊息</span>
+    <button onclick="hideToast()" class="text-stone-400 hover:text-white ml-2 text-xs">關閉</button>
+  </div>
+
+  <!-- Image & Highlight Lightbox Modal -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300">
+    <div class="relative w-full max-w-2xl bg-[#F7F6F2] rounded-3xl p-6 sm:p-8 shadow-2xl border border-amber-200/80 overflow-hidden animate-fadeIn">
+      <button onclick="closeLightbox()" aria-label="關閉視窗" class="absolute top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-amber-100 text-[#132535] transition-colors focus:ring-2 focus:ring-[#2BA99B]">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="w-full aspect-video rounded-2xl bg-gradient-to-br from-amber-100/70 via-stone-200 to-teal-100/60 border-2 border-dashed border-amber-300 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden mb-6 shadow-inner">
+        <i data-lucide="camera" class="w-10 h-10 text-brandNavy/50 mb-2"></i>
+        <span class="text-[10px] tracking-widest uppercase font-bold text-teal-800 bg-white/80 px-2.5 py-1 rounded-full mb-2">
+          PHOTO PREVIEW PLACEHOLDER
+        </span>
+        <p id="lightbox-placeholder-text" class="text-xs sm:text-sm font-semibold text-brandNavy max-w-md"></p>
+        <p class="text-[11px] text-stone-500 mt-2">（正式照片預留位置：日後直接替換為實體照片圖檔）</p>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <span id="lightbox-badge" class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-brandTeal/15 text-brandTeal border border-brandTeal/30"></span>
+          <span id="lightbox-date" class="text-xs text-stone-500 font-mono"></span>
+        </div>
+        <h3 id="lightbox-title" class="text-xl sm:text-2xl font-bold text-brandNavy font-serif"></h3>
+        <p id="lightbox-desc" class="text-sm sm:text-base text-stone-700 leading-relaxed"></p>
+        <div id="lightbox-tags" class="flex flex-wrap gap-1.5 pt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Top Floating Button -->
+  <button id="back-to-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="回到頁面頂部" class="fixed bottom-6 left-6 z-40 hidden p-3 rounded-full bg-white/95 text-brandNavy shadow-xl border border-amber-300/80 hover:bg-brandYellow transition-all transform hover:-translate-y-1 focus:ring-2 focus:ring-brandTeal">
+    <i data-lucide="arrow-up" class="w-5 h-5"></i>
+  </button>
+
+  <!-- Top Navigation Header -->
+  <header class="fixed top-0 left-0 right-0 z-40 bg-[#F7F6F2]/90 backdrop-blur-md border-b border-amber-200/50 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      
+      <!-- Logo / Brand Title -->
+      <a href="#hero" class="flex items-center gap-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-brandYellow flex items-center justify-center font-bold text-brandNavy shadow-sm group-hover:scale-105 transition-transform">
+          佑
+        </div>
+        <div class="flex flex-col">
+          <span class="font-serif font-bold text-lg tracking-wide text-brandNavy group-hover:text-brandTeal transition-colors">
+            廖佑軒
+          </span>
+          <span class="text-[10px] tracking-widest text-stone-500 font-mono -mt-1">
+            LIAO YOU-XUAN
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden lg:flex items-center space-x-1">
+        <a href="#hero" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-700 hover:text-brandNavy hover:bg-amber-100/50 transition-colors">
+          <span>首頁</span>
+          <span class="block text-[9px] text-stone-400 font-mono tracking-tighter">HOME</span>
+        </a>
+        <a href="#about" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-700 hover:text-brandNavy hover:bg-amber-100/50 transition-colors">
+          <span>關於我</span>
+          <span class="block text-[9px] text-stone-400 font-mono tracking-tighter">ABOUT</span>
+        </a>
+        <a href="#journey" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-700 hover:text-brandNavy hover:bg-amber-100/50 transition-colors">
+          <span>成長歷程</span>
+          <span class="block text-[9px] text-stone-400 font-mono tracking-tighter">JOURNEY</span>
+        </a>
+        <a href="#expertise" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-700 hover:text-brandNavy hover:bg-amber-100/50 transition-colors">
+          <span>專業領域</span>
+          <span class="block text-[9px] text-stone-400 font-mono tracking-tighter">EXPERTISE</span>
+        </a>
+        <a href="#projects" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-700 hover:text-brandNavy hover:bg-amber-100/50 transition-colors">
+          <span>實踐計畫</span>
+          <span class="block text-[9px] text-stone-400 font-mono tracking-tighter">PROJECTS</span>
+        </a>
+        <a href="#highlights" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-700 hover:text-brandNavy hover:bg-amber-100/50 transition-colors">
+          <span>精選成果</span>
+          <span class="block text-[9px] text-stone-400 font-mono tracking-tighter">HIGHLIGHTS</span>
+        </a>
+        <a href="#life" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-700 hover:text-brandNavy hover:bg-amber-100/50 transition-colors">
+          <span>生活手札</span>
+          <span class="block text-[9px] text-stone-400 font-mono tracking-tighter">LIFE NOTES</span>
+        </a>
+        <a href="#collaboration" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-700 hover:text-brandNavy hover:bg-amber-100/50 transition-colors">
+          <span>合作邀約</span>
+          <span class="block text-[9px] text-stone-400 font-mono tracking-tighter">COLLAB</span>
+        </a>
+      </nav>
+
+      <!-- Right Action & Mobile Toggle -->
+      <div class="flex items-center gap-3">
+        <a href="#contact" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-brandNavy text-white hover:bg-brandTeal transition-colors shadow-sm">
+          <i data-lucide="mail" class="w-3.5 h-3.5 text-brandYellow"></i>
+          <span>聯絡相遇</span>
+        </a>
+        <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="切換選單" class="lg:hidden p-2 rounded-lg text-brandNavy hover:bg-amber-100/60 focus:ring-2 focus:ring-brandTeal">
+          <i id="menu-icon" data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-[#F7F6F2] border-b border-amber-200/70 px-4 pt-2 pb-6 shadow-xl animate-fadeIn">
+      <div class="grid grid-cols-2 gap-2 text-sm">
+        <a href="#hero" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg font-medium text-stone-800 hover:bg-amber-100/70 flex justify-between items-center">
+          <span>首頁</span><span class="text-[10px] text-stone-400 font-mono">HOME</span>
+        </a>
+        <a href="#about" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg font-medium text-stone-800 hover:bg-amber-100/70 flex justify-between items-center">
+          <span>關於我</span><span class="text-[10px] text-stone-400 font-mono">ABOUT</span>
+        </a>
+        <a href="#journey" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg font-medium text-stone-800 hover:bg-amber-100/70 flex justify-between items-center">
+          <span>成長歷程</span><span class="text-[10px] text-stone-400 font-mono">JOURNEY</span>
+        </a>
+        <a href="#expertise" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg font-medium text-stone-800 hover:bg-amber-100/70 flex justify-between items-center">
+          <span>專業領域</span><span class="text-[10px] text-stone-400 font-mono">EXPERTISE</span>
+        </a>
+        <a href="#projects" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg font-medium text-stone-800 hover:bg-amber-100/70 flex justify-between items-center">
+          <span>實踐計畫</span><span class="text-[10px] text-stone-400 font-mono">PROJECTS</span>
+        </a>
+        <a href="#highlights" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg font-medium text-stone-800 hover:bg-amber-100/70 flex justify-between items-center">
+          <span>精選成果</span><span class="text-[10px] text-stone-400 font-mono">HIGHLIGHTS</span>
+        </a>
+        <a href="#life" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg font-medium text-stone-800 hover:bg-amber-100/70 flex justify-between items-center">
+          <span>生活手札</span><span class="text-[10px] text-stone-400 font-mono">LIFE</span>
+        </a>
+        <a href="#collaboration" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg font-medium text-stone-800 hover:bg-amber-100/70 flex justify-between items-center">
+          <span>講師合作</span><span class="text-[10px] text-stone-400 font-mono">COLLAB</span>
+        </a>
+      </div>
+      <div class="mt-4 pt-3 border-t border-stone-200">
+        <a href="#contact" onclick="closeMobileMenu()" class="w-full py-2.5 rounded-xl text-xs font-bold bg-brandNavy text-white flex items-center justify-center gap-2">
+          <i data-lucide="mail" class="w-4 h-4 text-brandYellow"></i>
+          <span>立即聯絡廖佑軒</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- SECTION 01 ｜ HOME 首頁 -->
+  <section id="hero" class="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden">
+    <!-- Japanese Sun, Mountain, and Tech Mesh background -->
+    <div class="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-gradient-to-br from-brandYellow/30 to-amber-200/10 blur-3xl"></div>
+      <div class="absolute top-1/2 -left-32 w-80 h-80 rounded-full bg-gradient-to-tr from-brandTeal/20 to-teal-100/10 blur-3xl"></div>
+      
+      <!-- Mountain SVG Layers -->
+      <svg class="absolute bottom-0 w-full h-48 md:h-72 text-amber-100/50" viewBox="0 0 1440 320" fill="currentColor" preserveAspectRatio="none">
+        <path d="M0,192L48,197.3C96,203,192,213,288,192C384,171,480,117,576,122.7C672,128,768,192,864,208C960,224,1056,192,1152,165.3C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      </svg>
+      <svg class="absolute -bottom-4 w-full h-36 md:h-56 text-brandTeal/10" viewBox="0 0 1440 320" fill="currentColor" preserveAspectRatio="none">
+        <path d="M0,256L60,240C120,224,240,192,360,197.3C480,203,600,245,720,240C840,235,960,181,1080,165.3C1200,149,1320,171,1380,181.3L1440,192L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+      </svg>
+
+      <!-- Matrix Dot Pattern -->
+      <div class="absolute inset-0 opacity-[0.035] bg-[radial-gradient(#132535_1px,transparent_1px)] [background-size:24px_24px]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        
+        <!-- Left: Headline & Introduction -->
+        <div class="lg:col-span-7 space-y-6 text-left">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/90 border border-amber-300 text-xs font-semibold tracking-wider text-brandNavy">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-700"></i>
+            <span class="font-mono uppercase">TECHNOLOGY × EDUCATION × LIFE</span>
+          </div>
+
+          <div>
+            <p class="text-base sm:text-lg text-stone-600 font-medium tracking-wide">你好，我是</p>
+            <h1 class="text-4xl sm:text-6xl font-bold font-serif text-brandNavy tracking-tight mt-1">
+              廖佑軒
+              <span class="block text-xl sm:text-2xl font-sans font-light text-stone-500 mt-2 tracking-widest">
+                LIAO YOU-XUAN
+              </span>
+            </h1>
+          </div>
+
+          <div class="border-l-4 border-brandYellow pl-4 py-1">
+            <p class="text-2xl sm:text-3xl font-serif font-bold text-brandNavy leading-snug">
+              「以技為本，以人為念。」
+            </p>
+            <p class="text-sm sm:text-base text-brandTeal font-medium mt-1">
+              讓技術成為連結人與人、地方與未來的力量。
+            </p>
+          </div>
+
+          <p class="text-base sm:text-lg text-brandDark leading-relaxed max-w-xl">
+            一位來自南投縣名間鄉的<span class="font-semibold text-brandNavy underline decoration-brandYellow decoration-2 underline-offset-4">技術轉譯者</span>，喜歡探索科技、教育，以及生活中的各種可能。把生硬的工程語言，化為溫暖動人的在地故事。
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 pt-3">
+            <a href="#about" class="px-7 py-3.5 rounded-xl bg-brandNavy text-white font-medium hover:bg-brandTeal transition-all transform hover:-translate-y-0.5 shadow-md flex items-center gap-2 group">
+              <span>認識我的故事</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+            <a href="#projects" class="px-7 py-3.5 rounded-xl bg-white border-2 border-stone-300 text-stone-800 font-medium hover:border-brandYellow hover:bg-amber-50/50 transition-all transform hover:-translate-y-0.5 shadow-sm">
+              探索我的作品
+            </a>
+          </div>
+
+          <!-- Role Triple Tag -->
+          <div class="pt-6 grid grid-cols-3 gap-3 border-t border-stone-200/80 max-w-md">
+            <div>
+              <span class="text-xs text-stone-500 block font-mono">ROLE 01</span>
+              <span class="text-sm font-bold text-brandNavy">技術轉譯者</span>
+            </div>
+            <div>
+              <span class="text-xs text-stone-500 block font-mono">ROLE 02</span>
+              <span class="text-sm font-bold text-brandNavy">技職推廣者</span>
+            </div>
+            <div>
+              <span class="text-xs text-stone-500 block font-mono">ROLE 03</span>
+              <span class="text-sm font-bold text-brandNavy">地方實踐者</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Portrait Visual Placeholder Block -->
+        <div class="lg:col-span-5 flex justify-center">
+          <div class="relative w-full max-w-sm sm:max-w-md">
+            <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-brandYellow to-brandTeal transform rotate-3 scale-98 opacity-30 blur-sm"></div>
+            
+            <div class="relative rounded-3xl bg-white p-4 shadow-xl border border-stone-200/80 overflow-hidden">
+              <div class="w-full aspect-[4/5] rounded-2xl bg-gradient-to-b from-stone-100 via-amber-50/40 to-teal-50/50 border-2 border-dashed border-amber-300 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden group">
+                <div class="w-20 h-20 rounded-full bg-amber-200/60 flex items-center justify-center text-amber-800 mb-4 shadow-inner">
+                  <i data-lucide="camera" class="w-8 h-8"></i>
+                </div>
+                <span class="text-xs font-mono font-bold tracking-wider text-teal-800 bg-white/90 px-3 py-1 rounded-full shadow-sm mb-2">
+                  PORTRAIT PLACEHOLDER
+                </span>
+                <h4 class="text-lg font-serif font-bold text-brandNavy">
+                  廖佑軒 個人照片預留位置
+                </h4>
+                <p class="text-xs text-stone-500 max-w-xs mt-2 leading-relaxed">
+                  自然光影 × 日系柔和氛圍 × 名間茶鄉或創客實作場景
+                </p>
+                <div class="mt-4 px-3 py-1.5 bg-amber-100/70 rounded-lg text-[11px] text-stone-600 border border-amber-200">
+                  日後替換：將此容器改為實體 &lt;img&gt; 即可完美融合
+                </div>
+              </div>
+
+              <!-- Hometown Floating Badge -->
+              <div class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl shadow-md border border-stone-200 flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-4 h-4 text-amber-600"></i>
+                <span class="text-xs font-semibold text-stone-700">南投縣名間鄉</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Scroll Down Prompt -->
+    <a href="#about" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col items-center cursor-pointer text-stone-400 hover:text-brandNavy transition-colors">
+      <span class="text-[10px] font-mono tracking-widest uppercase">Scroll Down</span>
+      <i data-lucide="chevron-down" class="w-4 h-4 animate-bounce mt-1"></i>
+    </a>
+  </section>
+
+  <!-- SECTION 02 ｜ ABOUT 關於我 -->
+  <section id="about" class="py-24 bg-white/80 border-t border-b border-amber-200/40 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-mono tracking-widest text-brandTeal uppercase font-bold bg-brandTeal/10 px-3 py-1 rounded-full">
+          SECTION 02 ｜ ABOUT
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-serif font-bold text-brandNavy mt-3">
+          從技術出發，走向更多可能。
+        </h2>
+        <div class="w-12 h-1 bg-brandYellow mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      <!-- Japanese Editorial Split Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Left: Lifestyle Photo Placeholder -->
+        <div class="lg:col-span-5">
+          <div class="relative">
+            <div class="w-full aspect-[3/4] rounded-2xl bg-gradient-to-br from-stone-100 to-amber-100/50 border-2 border-dashed border-amber-300 p-6 flex flex-col items-center justify-center text-center shadow-md">
+              <div class="p-3 bg-white rounded-full shadow-sm mb-3 text-brandTeal">
+                <i data-lucide="layers" class="w-6 h-6"></i>
+              </div>
+              <span class="text-xs font-mono text-stone-400 uppercase tracking-wider mb-1">
+                ABOUT PHOTO
+              </span>
+              <p class="font-serif font-bold text-brandNavy text-base">
+                在研究室或地方田野中的廖佑軒
+              </p>
+              <p class="text-xs text-stone-500 mt-2 max-w-xs">
+                （預留個人生活側拍，展現專注於工作或與人互動的真實神韻）
+              </p>
+            </div>
+            <div class="absolute -bottom-4 -left-4 bg-brandYellow text-brandNavy px-3 py-2 rounded-xl shadow-lg text-xs font-mono font-bold">
+              #TECH_TRANSLATOR
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Story Narrative & 3 Core Elements -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="space-y-4 text-base sm:text-lg text-stone-700 leading-relaxed font-sans">
+            <p>
+              廖佑軒，來自南投縣名間鄉。大學畢業於<span class="font-semibold text-brandNavy">國立臺灣科技大學應用科技學士學位學程</span>，目前就讀於<span class="font-semibold text-brandNavy">國立臺北科技大學技術及職業教育研究所</span>持續深造。
+            </p>
+            <p>
+              高中時期全心投入電腦機械製圖技能競賽，曾榮獲<span class="text-brandNavy font-semibold bg-amber-100/70 px-1.5 py-0.5 rounded">全國高級中等學校工業類學生技藝競賽金手獎第一名</span>，並順利透過技優保送進入頂尖技職殿堂。
+            </p>
+            <div class="my-4 p-4 bg-[#F7F6F2] rounded-2xl border-l-4 border-brandTeal font-serif text-brandNavy text-base sm:text-lg italic">
+              「技術的價值，不只是個人的專業成就或冷冽的數字，更在於能否讓不同背景、不同年齡的人都能理解、學習與實際運用。」
+            </div>
+            <p>
+              因此，我以<span class="font-bold text-brandNavy">「技術轉譯者」</span>自我定位。致力於將生澀的工程製造、數位工具與科技概念，轉化為貼近生活、充滿溫度且易於吸收的學習體驗。
+            </p>
+          </div>
+
+          <!-- Triple Pillars -->
+          <div class="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-[#F7F6F2] border border-amber-200/70">
+              <div class="w-8 h-8 rounded-lg bg-amber-200/80 flex items-center justify-center text-amber-900 font-bold mb-2">
+                技
+              </div>
+              <h4 class="font-bold text-brandNavy text-sm">技術・精進根基</h4>
+              <p class="text-xs text-stone-600 mt-1">
+                以機械製圖金手獎的嚴謹與3D列印實作為基石。
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-[#F7F6F2] border border-teal-200/70">
+              <div class="w-8 h-8 rounded-lg bg-teal-200/80 flex items-center justify-center text-teal-900 font-bold mb-2">
+                教
+              </div>
+              <h4 class="font-bold text-brandNavy text-sm">教育・跨域轉譯</h4>
+              <p class="text-xs text-stone-600 mt-1">
+                拆解深奧術語，為孩子與學員開啟想像的窗口。
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-[#F7F6F2] border border-emerald-200/70">
+              <div class="w-8 h-8 rounded-lg bg-emerald-200/80 flex items-center justify-center text-emerald-900 font-bold mb-2">
+                地
+              </div>
+              <h4 class="font-bold text-brandNavy text-sm">地方・扎根回饋</h4>
+              <p class="text-xs text-stone-600 mt-1">
+                返鄉服務名間鄉，以數位平權陪伴在地社區共好。
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 03 ｜ JOURNEY 我的歷程 -->
+  <section id="journey" class="py-24 bg-[#F7F6F2] relative">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-mono tracking-widest text-brandTeal uppercase font-bold bg-brandTeal/10 px-3 py-1 rounded-full">
+          SECTION 03 ｜ JOURNEY
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-serif font-bold text-brandNavy mt-3">
+          我的成長歷程
+        </h2>
+        <p class="text-stone-600 text-sm sm:text-base mt-2">
+          從選手的淬鍊、志工的奔走，到獨立團隊與返鄉深耕的每一步足跡。
+        </p>
+        <div class="w-12 h-1 bg-brandYellow mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      <!-- Vertical Timeline -->
+      <div class="relative border-l-2 border-amber-300 ml-4 sm:ml-32 md:ml-40 space-y-12">
+        
+        <!-- 2020 Milestone -->
+        <div class="relative pl-6 sm:pl-10 group">
+          <div class="sm:absolute sm:-left-36 md:-left-44 top-0 text-left mb-2 sm:mb-0">
+            <span class="font-mono text-2xl font-bold text-brandNavy tracking-tight block">2020</span>
+            <span class="text-xs font-bold text-brandTeal tracking-wider uppercase">技能出發</span>
+          </div>
+          <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-4 border-brandYellow group-hover:border-brandTeal group-hover:scale-125 transition-all shadow-sm"></div>
+
+          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-stone-200/90 hover:shadow-md hover:border-amber-300 transition-all">
+            <h3 class="text-lg sm:text-xl font-serif font-bold text-brandNavy">
+              技能競賽的起點：從選手到保送臺科大
+            </h3>
+            <p class="text-stone-700 text-sm sm:text-base leading-relaxed mt-2.5">
+              高中時期專注於電腦機械製圖技能競賽，榮獲「全國高級中等學校工業類學生技藝競賽」電腦機械製圖職種金手獎第一名，並以優異成績透過技優保送進入國立臺灣科技大學應用科技學士學位學程。
+            </p>
+            <div class="mt-3.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/70 text-xs sm:text-sm text-stone-700 italic">
+              💡 高強度的選手訓練，奠定了我對精密技術與結構細節的敏銳度，也讓我初次體會到專注一事的強大力量。
+            </div>
+            <div onclick="openLightbox('2020 工業類技藝競賽金手獎第一名現場紀錄', '2020 金手獎第1名頒獎現場', '全國工類技藝競賽電腦機械製圖 金手獎第一名', '歷程記錄・2020', '2020')" class="mt-4 rounded-xl border border-dashed border-stone-300 bg-stone-50 p-3 flex items-center justify-between cursor-pointer hover:bg-amber-50/50 hover:border-amber-400 transition-colors">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="camera" class="w-4 h-4 text-stone-400"></i>
+                <span class="text-xs font-medium text-stone-600">2020 工業類技藝競賽金手獎第一名現場紀錄</span>
+              </div>
+              <span class="text-[11px] font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 shrink-0">點擊預覽</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2023 Milestone -->
+        <div class="relative pl-6 sm:pl-10 group">
+          <div class="sm:absolute sm:-left-36 md:-left-44 top-0 text-left mb-2 sm:mb-0">
+            <span class="font-mono text-2xl font-bold text-brandNavy tracking-tight block">2023</span>
+            <span class="text-xs font-bold text-brandTeal tracking-wider uppercase">跨域行動</span>
+          </div>
+          <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-4 border-brandYellow group-hover:border-brandTeal group-hover:scale-125 transition-all shadow-sm"></div>
+
+          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-stone-200/90 hover:shadow-md hover:border-amber-300 transition-all">
+            <h3 class="text-lg sm:text-xl font-serif font-bold text-brandNavy">
+              創立蕃薯球志工隊：點燃偏鄉創客星火
+            </h3>
+            <p class="text-stone-700 text-sm sm:text-base leading-relaxed mt-2.5">
+              號召志同道合的跨領域大專青年共同成立「蕃薯球志工隊」，走進偏鄉學校與社區，將3D列印、創客實作與科技教育資源帶入資源相對匱乏的角落。
+            </p>
+            <div class="mt-3.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/70 text-xs sm:text-sm text-stone-700 italic">
+              💡 走出校園走入部落與偏鄉，讓我看見技術若沒有溫暖的人際連結，就只是冷冰冰的器械；真正的價值在於啟發每一個雙眼放光的孩子。
+            </div>
+            <div onclick="openLightbox('2023 蕃薯球志工隊偏鄉巡迴教學活動紀錄', '偏鄉科技營隊服務現場紀錄', '創立蕃薯球志工隊：點燃偏鄉創客星火', '歷程記錄・2023', '2023')" class="mt-4 rounded-xl border border-dashed border-stone-300 bg-stone-50 p-3 flex items-center justify-between cursor-pointer hover:bg-amber-50/50 hover:border-amber-400 transition-colors">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="camera" class="w-4 h-4 text-stone-400"></i>
+                <span class="text-xs font-medium text-stone-600">2023 蕃薯球志工隊偏鄉巡迴教學活動紀錄</span>
+              </div>
+              <span class="text-[11px] font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 shrink-0">點擊預覽</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2025 Milestone -->
+        <div class="relative pl-6 sm:pl-10 group">
+          <div class="sm:absolute sm:-left-36 md:-left-44 top-0 text-left mb-2 sm:mb-0">
+            <span class="font-mono text-2xl font-bold text-brandNavy tracking-tight block">2025</span>
+            <span class="text-xs font-bold text-brandTeal tracking-wider uppercase">青年榮耀</span>
+          </div>
+          <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-4 border-brandYellow group-hover:border-brandTeal group-hover:scale-125 transition-all shadow-sm"></div>
+
+          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-stone-200/90 hover:shadow-md hover:border-amber-300 transition-all">
+            <h3 class="text-lg sm:text-xl font-serif font-bold text-brandNavy">
+              教育實踐獲肯定：榮獲青志獎與總統接見
+            </h3>
+            <p class="text-stone-700 text-sm sm:text-base leading-relaxed mt-2.5">
+              長年耕耘教育實踐與青年志願服務的努力獲得國家級肯定，榮獲第二屆青志獎「樂苗新秀獎」，並獲邀進入總統府獲得總統接見與嘉勉。
+            </p>
+            <div class="mt-3.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/70 text-xs sm:text-sm text-stone-700 italic">
+              💡 這份榮譽屬於每一位曾一起挽起袖子走進鄉村的夥伴，也更堅定了我將技術轉譯、教育推廣視為一生志業的決心。
+            </div>
+            <div onclick="openLightbox('2025 獲頒青志獎樂苗新秀獎及總統接見紀念照', '第二屆青志獎頒獎典禮現場與接見留影', '教育實踐獲肯定：榮獲青志獎與總統接見', '歷程記錄・2025', '2025')" class="mt-4 rounded-xl border border-dashed border-stone-300 bg-stone-50 p-3 flex items-center justify-between cursor-pointer hover:bg-amber-50/50 hover:border-amber-400 transition-colors">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="camera" class="w-4 h-4 text-stone-400"></i>
+                <span class="text-xs font-medium text-stone-600">2025 獲頒青志獎樂苗新秀獎及總統接見紀念照</span>
+              </div>
+              <span class="text-[11px] font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 shrink-0">點擊預覽</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2026 Milestone 1 -->
+        <div class="relative pl-6 sm:pl-10 group">
+          <div class="sm:absolute sm:-left-36 md:-left-44 top-0 text-left mb-2 sm:mb-0">
+            <span class="font-mono text-2xl font-bold text-brandNavy tracking-tight block">2026</span>
+            <span class="text-xs font-bold text-brandTeal tracking-wider uppercase">獨立探索</span>
+          </div>
+          <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-4 border-brandYellow group-hover:border-brandTeal group-hover:scale-125 transition-all shadow-sm"></div>
+
+          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-stone-200/90 hover:shadow-md hover:border-amber-300 transition-all">
+            <h3 class="text-lg sm:text-xl font-serif font-bold text-brandNavy">
+              重新出發：成立獨立青年團隊「域見未來」
+            </h3>
+            <p class="text-stone-700 text-sm sm:text-base leading-relaxed mt-2.5">
+              在階段性任務圓滿後離開蕃薯球志工隊，秉持更開闊的實驗精神，重新創立獨立青年團隊「域見未來」，持續深耕創客教育、跨領域科技學習與地方實踐工作。
+            </p>
+            <div class="mt-3.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/70 text-xs sm:text-sm text-stone-700 italic">
+              💡 「域見未來」象徵在地方疆域與跨域科技的交會處，與下一個世代相遇。這不是以往團隊的更名或延續，而是嶄新的獨立探索。
+            </div>
+            <div onclick="openLightbox('2026 獨立青年團隊「域見未來」啟動籌備與工作坊', '域見未來團隊成立籌備與首場跨域工作坊', '成立獨立青年團隊「域見未來」', '歷程記錄・2026', '2026')" class="mt-4 rounded-xl border border-dashed border-stone-300 bg-stone-50 p-3 flex items-center justify-between cursor-pointer hover:bg-amber-50/50 hover:border-amber-400 transition-colors">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="camera" class="w-4 h-4 text-stone-400"></i>
+                <span class="text-xs font-medium text-stone-600">2026 獨立青年團隊「域見未來」啟動籌備與工作坊</span>
+              </div>
+              <span class="text-[11px] font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 shrink-0">點擊預覽</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2026 Milestone 2 -->
+        <div class="relative pl-6 sm:pl-10 group">
+          <div class="sm:absolute sm:-left-36 md:-left-44 top-0 text-left mb-2 sm:mb-0">
+            <span class="font-mono text-2xl font-bold text-brandNavy tracking-tight block">2026</span>
+            <span class="text-xs font-bold text-brandTeal tracking-wider uppercase">扎根深耕</span>
+          </div>
+          <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-4 border-brandYellow group-hover:border-brandTeal group-hover:scale-125 transition-all shadow-sm"></div>
+
+          <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-stone-200/90 hover:shadow-md hover:border-amber-300 transition-all">
+            <h3 class="text-lg sm:text-xl font-serif font-bold text-brandNavy">
+              返鄉與研究：新民數位機會中心執行長 × 北科大技職所
+            </h3>
+            <p class="text-stone-700 text-sm sm:text-base leading-relaxed mt-2.5">
+              接任南投名間「新民數位機會中心（DOC）」執行長，全心投入鄉土數位平權與地方文史數位化；同時進入國立臺北科技大學技術及職業教育研究所深造，結合理論與田野。
+            </p>
+            <div class="mt-3.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/70 text-xs sm:text-sm text-stone-700 italic">
+              💡 一邊在學術殿堂探討技職體系與教學方法學，一邊在泥土氣息的鄉間陪伴長者點擊鍵盤，這是我最嚮往的技術轉譯者日常。
+            </div>
+            <div onclick="openLightbox('2026 新民數位機會中心在地課程與研究生生活', '新民DOC課堂長輩學習與北科大研究日常', '新民DOC執行長與技職所深造', '歷程記錄・2026', '2026')" class="mt-4 rounded-xl border border-dashed border-stone-300 bg-stone-50 p-3 flex items-center justify-between cursor-pointer hover:bg-amber-50/50 hover:border-amber-400 transition-colors">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="camera" class="w-4 h-4 text-stone-400"></i>
+                <span class="text-xs font-medium text-stone-600">2026 新民數位機會中心在地課程與研究生生活</span>
+              </div>
+              <span class="text-[11px] font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 shrink-0">點擊預覽</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Clarification Notice -->
+      <div class="mt-16 p-4 rounded-xl bg-white border border-stone-200 text-xs sm:text-sm text-stone-600 flex items-start gap-3">
+        <i data-lucide="shield-check" class="w-5 h-5 text-brandTeal shrink-0 mt-0.5"></i>
+        <div>
+          <span class="font-bold text-brandNavy">團隊獨立性說明：</span>
+          「蕃薯球志工隊」與「域見未來」為完全不同且各自獨立運作之團隊，後者並非前者的更名或改制轉型。廖佑軒於2025年圓滿卸下前隊職務後，於2026年自主籌組「域見未來」，特此完整載明。
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 04 ｜ EXPERTISE 專業領域 -->
+  <section id="expertise" class="py-24 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-mono tracking-widest text-brandTeal uppercase font-bold bg-brandTeal/10 px-3 py-1 rounded-full">
+          SECTION 04 ｜ EXPERTISE
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-serif font-bold text-brandNavy mt-3">
+          專業核心領域
+        </h2>
+        <p class="text-stone-600 text-sm sm:text-base mt-2">
+          結合製造硬底子、教育軟實力與地方關懷的四維向度。
+        </p>
+        <div class="w-12 h-1 bg-brandYellow mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Card 1 -->
+        <div class="rounded-2xl p-8 bg-[#F7F6F2] border border-stone-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500"></div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="p-3.5 rounded-xl bg-white shadow-sm text-brandNavy group-hover:scale-110 transition-transform">
+              <i data-lucide="cpu" class="w-6 h-6 text-brandTeal"></i>
+            </div>
+            <span class="text-[11px] font-mono tracking-widest text-stone-400 uppercase">
+              MAKER & STEAM EDUCATION
+            </span>
+          </div>
+          <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+            創客與科技教育
+          </h3>
+          <p class="text-stone-600 text-sm leading-relaxed mt-3">
+            結合3D列印、開源軟硬體與數位製造工具，設計低門檻、高創意的實作教案，讓孩子與學員在動手做中理解工程思維與解決問題的成就感。
+          </p>
+          <div class="flex flex-wrap gap-2 pt-6 mt-4 border-t border-stone-200/60">
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#3D列印</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#數位製造</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#STEAM</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#跨領域實作</span>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="rounded-2xl p-8 bg-[#F7F6F2] border border-stone-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-teal-500 to-teal-600"></div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="p-3.5 rounded-xl bg-white shadow-sm text-brandNavy group-hover:scale-110 transition-transform">
+              <i data-lucide="compass" class="w-6 h-6 text-brandTeal"></i>
+            </div>
+            <span class="text-[11px] font-mono tracking-widest text-stone-400 uppercase">
+              TVET ADVOCACY & CAREER
+            </span>
+          </div>
+          <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+            技職教育推廣
+          </h3>
+          <p class="text-stone-600 text-sm leading-relaxed mt-3">
+            從金手獎第一名保送選手的視角出發，拆解技能競賽的心態鍛鍊與技術累積，引導青年打破刻板印象，看見技職實力所能通往的多元可能。
+          </p>
+          <div class="flex flex-wrap gap-2 pt-6 mt-4 border-t border-stone-200/60">
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#技能競賽經驗</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#技職學習歷程</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#生涯探索</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#專案輔導</span>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="rounded-2xl p-8 bg-[#F7F6F2] border border-stone-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-500 to-sky-600"></div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="p-3.5 rounded-xl bg-white shadow-sm text-brandNavy group-hover:scale-110 transition-transform">
+              <i data-lucide="lightbulb" class="w-6 h-6 text-brandTeal"></i>
+            </div>
+            <span class="text-[11px] font-mono tracking-widest text-stone-400 uppercase">
+              DIGITAL EMPOWERMENT & AI
+            </span>
+          </div>
+          <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+            數位學習與培力
+          </h3>
+          <p class="text-stone-600 text-sm leading-relaxed mt-3">
+            轉譯前沿生成式AI與數位雲端工具，為地方居民、高齡長者及教育現場量身打造易學易用的教材，落實數位平權與終身學習。
+          </p>
+          <div class="flex flex-wrap gap-2 pt-6 mt-4 border-t border-stone-200/60">
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#生成式AI</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#數位工具應用</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#中高齡數位素養</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#資訊平權</span>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="rounded-2xl p-8 bg-[#F7F6F2] border border-stone-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="p-3.5 rounded-xl bg-white shadow-sm text-brandNavy group-hover:scale-110 transition-transform">
+              <i data-lucide="heart" class="w-6 h-6 text-brandTeal"></i>
+            </div>
+            <span class="text-[11px] font-mono tracking-widest text-stone-400 uppercase">
+              LOCAL INNOVATION & PRACTICE
+            </span>
+          </div>
+          <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+            地方創新與社會實踐
+          </h3>
+          <p class="text-stone-600 text-sm leading-relaxed mt-3">
+            扎根地方社區與數位機會中心，運用科技紀錄文史、培訓在地組織青年，讓技術真正扎根泥土，成為活化鄉村與凝聚世代的媒介。
+          </p>
+          <div class="flex flex-wrap gap-2 pt-6 mt-4 border-t border-stone-200/60">
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#偏鄉教育</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#青年志願服務</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#社區數位培力</span>
+            <span class="px-2.5 py-1 text-xs rounded-md bg-white text-stone-700 border border-stone-200/80 font-medium">#地方文化紀錄</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 05 ｜ PROJECTS 實踐計畫 -->
+  <section id="projects" class="py-24 bg-[#F7F6F2] relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-mono tracking-widest text-brandTeal uppercase font-bold bg-brandTeal/10 px-3 py-1 rounded-full">
+          SECTION 05 ｜ PROJECTS
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-serif font-bold text-brandNavy mt-3">
+          實踐計畫與團隊行動
+        </h2>
+        <p class="text-stone-600 text-sm sm:text-base mt-2">
+          每一項專案都是將理念化為實際行動的具體足跡。
+        </p>
+        <div class="w-12 h-1 bg-brandYellow mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      <div class="space-y-10">
+        <!-- Project 1: 域見未來 -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 lg:p-10 border border-stone-200/90 shadow-sm hover:shadow-md transition-all">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-5">
+              <div onclick="openLightbox('【域見未來】團隊教具開發與實體教學工作坊封面', '全新獨立團隊域見未來之教具研發與工作坊照片', '域見未來：跨域科技與未來學習', '實踐專案封面', '2026 - 進行中')" class="w-full aspect-[16/10] rounded-2xl bg-gradient-to-br from-amber-50 to-stone-100 border-2 border-dashed border-amber-300 p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-amber-100/30 transition-all group">
+                <i data-lucide="camera" class="w-8 h-8 text-stone-400 group-hover:text-amber-600 transition-colors mb-2"></i>
+                <span class="text-xs font-mono font-bold text-stone-500 uppercase tracking-wider">COVER PLACEHOLDER</span>
+                <p class="text-xs font-medium text-stone-700 mt-2 max-w-xs">【域見未來】團隊教具開發與實體教學工作坊封面</p>
+                <span class="mt-3 text-[11px] text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">點擊放大檢視</span>
+              </div>
+            </div>
+            <div class="lg:col-span-7 space-y-4">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-brandNavy text-white">現正推動</span>
+                <span class="text-xs font-mono text-stone-500">2026 - 進行中</span>
+                <span class="text-xs font-semibold text-stone-600 ml-auto">角色：發起人 / 計畫主持人</span>
+              </div>
+              <h3 class="text-2xl sm:text-3xl font-serif font-bold text-brandNavy">域見未來</h3>
+              <p class="text-sm font-medium text-brandTeal">獨立青年團隊・跨域科技與未來學習</p>
+              <p class="text-stone-700 text-sm sm:text-base leading-relaxed">
+                2026年重新出發創立的全新獨立青年團隊（非既有組織之更名或轉型），專注於開發現代科技教材、低成本開源教具，並將前沿科技概念帶入城鄉各級校園與青年社群。
+              </p>
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-amber-100 text-amber-900 border-amber-300">獨立團隊</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-amber-100 text-amber-900 border-amber-300">STEAM創客</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-amber-100 text-amber-900 border-amber-300">跨領域學習</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-amber-100 text-amber-900 border-amber-300">地方實踐</span>
+              </div>
+
+              <div id="project-detail-1" class="hidden mt-4 pt-4 border-t border-stone-200 space-y-2 bg-stone-50/80 p-4 rounded-xl">
+                <h4 class="text-xs font-bold text-stone-500 tracking-wider uppercase">主要實踐面向與進展：</h4>
+                <ul class="space-y-1.5 text-sm text-stone-700">
+                  <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">•</span><span>自主研發模組化 3D 列印與基礎電路探索教案</span></li>
+                  <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">•</span><span>舉辦跨域科技體驗工作坊，讓不同背景學員零門檻動手做</span></li>
+                  <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">•</span><span>串連地方青年創作者與教育工作者，建立開放的共學網絡</span></li>
+                </ul>
+              </div>
+
+              <div class="pt-2">
+                <button onclick="toggleProject('1')" class="text-xs font-bold text-brandNavy hover:text-brandTeal inline-flex items-center gap-1 transition-colors">
+                  <span id="proj-btn-text-1">查看更多專案面向與成果</span>
+                  <i id="proj-icon-1" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 2: 新民數位機會中心 -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 lg:p-10 border border-stone-200/90 shadow-sm hover:shadow-md transition-all">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-5">
+              <div onclick="openLightbox('【新民DOC】執行長社區長者教學與在地培力實景封面', '執行長陪伴名間在地長者操作平板與智慧型手機', '新民數位機會中心 (DOC)', '地方實踐專案', '2026 - 進行中')" class="w-full aspect-[16/10] rounded-2xl bg-gradient-to-br from-teal-50 to-stone-100 border-2 border-dashed border-teal-300 p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-teal-100/30 transition-all group">
+                <i data-lucide="camera" class="w-8 h-8 text-stone-400 group-hover:text-teal-600 transition-colors mb-2"></i>
+                <span class="text-xs font-mono font-bold text-stone-500 uppercase tracking-wider">COVER PLACEHOLDER</span>
+                <p class="text-xs font-medium text-stone-700 mt-2 max-w-xs">【新民DOC】執行長社區長者教學與在地培力實景封面</p>
+                <span class="mt-3 text-[11px] text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">點擊放大檢視</span>
+              </div>
+            </div>
+            <div class="lg:col-span-7 space-y-4">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-brandNavy text-white">深度實踐</span>
+                <span class="text-xs font-mono text-stone-500">2026 - 進行中</span>
+                <span class="text-xs font-semibold text-stone-600 ml-auto">角色：執行長</span>
+              </div>
+              <h3 class="text-2xl sm:text-3xl font-serif font-bold text-brandNavy">新民數位機會中心 (DOC)</h3>
+              <p class="text-sm font-medium text-brandTeal">地方實踐・鄉村數位培力與文化典藏</p>
+              <p class="text-stone-700 text-sm sm:text-base leading-relaxed">
+                返鄉擔任新民數位機會中心執行長，直接面對南投名間在地的數位落差挑戰。規劃生活化手機應用、社群經營、生成式AI導引課程，並協助長輩與在地小農進行數位行銷與故事記錄。
+              </p>
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-teal-100 text-teal-900 border-teal-300">返鄉深耕</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-teal-100 text-teal-900 border-teal-300">中高齡數位素養</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-teal-100 text-teal-900 border-teal-300">地方文化數位化</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-teal-100 text-teal-900 border-teal-300">數位平權</span>
+              </div>
+
+              <div id="project-detail-2" class="hidden mt-4 pt-4 border-t border-stone-200 space-y-2 bg-stone-50/80 p-4 rounded-xl">
+                <h4 class="text-xs font-bold text-stone-500 tracking-wider uppercase">主要實踐面向與進展：</h4>
+                <ul class="space-y-1.5 text-sm text-stone-700">
+                  <li class="flex items-start gap-2"><span class="text-teal-600 mt-0.5">•</span><span>設計適合高齡長輩的圖解大字體智慧型手機實用教案</span></li>
+                  <li class="flex items-start gap-2"><span class="text-teal-600 mt-0.5">•</span><span>推動名間在地茶鄉與田野故事的影音數位典藏</span></li>
+                  <li class="flex items-start gap-2"><span class="text-teal-600 mt-0.5">•</span><span>打造社區居民能安心交流、自主發問的溫馨數位學習空間</span></li>
+                </ul>
+              </div>
+
+              <div class="pt-2">
+                <button onclick="toggleProject('2')" class="text-xs font-bold text-brandNavy hover:text-brandTeal inline-flex items-center gap-1 transition-colors">
+                  <span id="proj-btn-text-2">查看更多專案面向與成果</span>
+                  <i id="proj-icon-2" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3: 蕃薯球志工隊 -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 lg:p-10 border border-stone-200/90 shadow-sm hover:shadow-md transition-all">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-5">
+              <div onclick="openLightbox('【蕃薯球志工隊】歷年偏鄉服務大合照與實作剪影封面', '蕃薯球志工隊偏鄉巡迴服務團隊大合影與實況', '蕃薯球志工隊（過往經歷）', '志工服務里程碑', '2023 - 2025')" class="w-full aspect-[16/10] rounded-2xl bg-gradient-to-br from-sky-50 to-stone-100 border-2 border-dashed border-sky-300 p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-sky-100/30 transition-all group">
+                <i data-lucide="camera" class="w-8 h-8 text-stone-400 group-hover:text-sky-600 transition-colors mb-2"></i>
+                <span class="text-xs font-mono font-bold text-stone-500 uppercase tracking-wider">COVER PLACEHOLDER</span>
+                <p class="text-xs font-medium text-stone-700 mt-2 max-w-xs">【蕃薯球志工隊】歷年偏鄉服務大合照與實作剪影封面</p>
+                <span class="mt-3 text-[11px] text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">點擊放大檢視</span>
+              </div>
+            </div>
+            <div class="lg:col-span-7 space-y-4">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-stone-600 text-white">圓滿里程碑</span>
+                <span class="text-xs font-mono text-stone-500">2023 - 2025 (過往經歷)</span>
+                <span class="text-xs font-semibold text-stone-600 ml-auto">角色：創辦人（過往經歷）</span>
+              </div>
+              <h3 class="text-2xl sm:text-3xl font-serif font-bold text-brandNavy">蕃薯球志工隊</h3>
+              <p class="text-sm font-medium text-brandTeal">重要起點・偏鄉創客與技職青年志願服務</p>
+              <p class="text-stone-700 text-sm sm:text-base leading-relaxed">
+                2023年號召青年成立的志工團隊。歷時兩年多的全心投入，帶著3D印表機與焊接工具箱穿梭於多所偏鄉國中小，開啟了許多孩子對工程世界的想像，並榮獲第二屆青志獎樂苗新秀獎肯定。此階段任務已圓滿告一段落。
+              </p>
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-sky-100 text-sky-900 border-sky-300">過往歷程</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-sky-100 text-sky-900 border-sky-300">偏鄉創客</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-sky-100 text-sky-900 border-sky-300">技職青年前鋒</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-sky-100 text-sky-900 border-sky-300">青志獎肯定</span>
+              </div>
+
+              <div id="project-detail-3" class="hidden mt-4 pt-4 border-t border-stone-200 space-y-2 bg-stone-50/80 p-4 rounded-xl">
+                <h4 class="text-xs font-bold text-stone-500 tracking-wider uppercase">主要實踐面向與進展：</h4>
+                <ul class="space-y-1.5 text-sm text-stone-700">
+                  <li class="flex items-start gap-2"><span class="text-sky-600 mt-0.5">•</span><span>歷經數十場偏鄉科技營隊，跨足南投、花東等多元場域</span></li>
+                  <li class="flex items-start gap-2"><span class="text-sky-600 mt-0.5">•</span><span>引領技職背景大學生發揮所學，將專業轉換為利他養分</span></li>
+                  <li class="flex items-start gap-2"><span class="text-sky-600 mt-0.5">•</span><span>奠定日後深化「技術轉譯」與「技職教育推廣」的核心哲學</span></li>
+                </ul>
+              </div>
+
+              <div class="pt-2">
+                <button onclick="toggleProject('3')" class="text-xs font-bold text-brandNavy hover:text-brandTeal inline-flex items-center gap-1 transition-colors">
+                  <span id="proj-btn-text-3">查看更多專案面向與成果</span>
+                  <i id="proj-icon-3" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 4: 創客教育與跨域實作 -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 lg:p-10 border border-stone-200/90 shadow-sm hover:shadow-md transition-all">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-5">
+              <div onclick="openLightbox('【創客實作】學員3D列印作品展示與機械製圖設計畫面', '創客工作坊學員打印模型與機構設計圖形展示', '創客教育與跨域實作工坊', '實作工坊教學', '2020 - 迄今')" class="w-full aspect-[16/10] rounded-2xl bg-gradient-to-br from-emerald-50 to-stone-100 border-2 border-dashed border-emerald-300 p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-emerald-100/30 transition-all group">
+                <i data-lucide="camera" class="w-8 h-8 text-stone-400 group-hover:text-emerald-600 transition-colors mb-2"></i>
+                <span class="text-xs font-mono font-bold text-stone-500 uppercase tracking-wider">COVER PLACEHOLDER</span>
+                <p class="text-xs font-medium text-stone-700 mt-2 max-w-xs">【創客實作】學員3D列印作品展示與機械製圖設計畫面</p>
+                <span class="mt-3 text-[11px] text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">點擊放大檢視</span>
+              </div>
+            </div>
+            <div class="lg:col-span-7 space-y-4">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-brandNavy text-white">持續精進</span>
+                <span class="text-xs font-mono text-stone-500">2020 - 迄今</span>
+                <span class="text-xs font-semibold text-stone-600 ml-auto">角色：教案設計師 / 授課講師</span>
+              </div>
+              <h3 class="text-2xl sm:text-3xl font-serif font-bold text-brandNavy">創客教育與跨域實作工坊</h3>
+              <p class="text-sm font-medium text-brandTeal">技術落實・3D列印 × 數位成形 × 實作導向教學</p>
+              <p class="text-stone-700 text-sm sm:text-base leading-relaxed">
+                結合高中金手獎精密製圖背景與大專應用科技實務，將看似冷硬的工程製圖軟體、分層切片演算與3D列印硬體，轉化為人人都可在兩小時內完成第一件作品的直覺式教案。
+              </p>
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-emerald-100 text-emerald-900 border-emerald-300">3D列印</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-emerald-100 text-emerald-900 border-emerald-300">CAD電腦製圖</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-emerald-100 text-emerald-900 border-emerald-300">機構原型設計</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border bg-emerald-100 text-emerald-900 border-emerald-300">動手造物</span>
+              </div>
+
+              <div id="project-detail-4" class="hidden mt-4 pt-4 border-t border-stone-200 space-y-2 bg-stone-50/80 p-4 rounded-xl">
+                <h4 class="text-xs font-bold text-stone-500 tracking-wider uppercase">主要實踐面向與進展：</h4>
+                <ul class="space-y-1.5 text-sm text-stone-700">
+                  <li class="flex items-start gap-2"><span class="text-emerald-600 mt-0.5">•</span><span>客製化 CAD/CAM 基礎入門教學法，排除初學者對三維幾何的畏懼</span></li>
+                  <li class="flex items-start gap-2"><span class="text-emerald-600 mt-0.5">•</span><span>引導學生從日常痛點出發，自行量測、建模並打印解決生活問題的零件</span></li>
+                  <li class="flex items-start gap-2"><span class="text-emerald-600 mt-0.5">•</span><span>推動綠色創客（Eco-Maker）思維，討論材料回收與環境永續議題</span></li>
+                </ul>
+              </div>
+
+              <div class="pt-2">
+                <button onclick="toggleProject('4')" class="text-xs font-bold text-brandNavy hover:text-brandTeal inline-flex items-center gap-1 transition-colors">
+                  <span id="proj-btn-text-4">查看更多專案面向與成果</span>
+                  <i id="proj-icon-4" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 06 ｜ HIGHLIGHTS 精選成果 -->
+  <section id="highlights" class="py-24 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-mono tracking-widest text-brandTeal uppercase font-bold bg-brandTeal/10 px-3 py-1 rounded-full">
+          SECTION 06 ｜ HIGHLIGHTS
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-serif font-bold text-brandNavy mt-3">
+          精選成果與剪影
+        </h2>
+        <p class="text-stone-600 text-sm sm:text-base mt-2">
+          穿梭於競賽工坊、偏鄉學校、高齡教室與田野間的真實軌跡。
+        </p>
+        <div class="w-12 h-1 bg-brandYellow mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="flex flex-wrap justify-center gap-2 mb-12">
+        <button onclick="filterHighlights('all', this)" class="hl-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all bg-brandNavy text-white shadow-sm">
+          全部成果
+        </button>
+        <button onclick="filterHighlights('education', this)" class="hl-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all bg-[#F7F6F2] text-stone-600 hover:bg-amber-100/60">
+          教育活動
+        </button>
+        <button onclick="filterHighlights('maker', this)" class="hl-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all bg-[#F7F6F2] text-stone-600 hover:bg-amber-100/60">
+          創客作品
+        </button>
+        <button onclick="filterHighlights('community', this)" class="hl-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all bg-[#F7F6F2] text-stone-600 hover:bg-amber-100/60">
+          地方服務
+        </button>
+        <button onclick="filterHighlights('award', this)" class="hl-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all bg-[#F7F6F2] text-stone-600 hover:bg-amber-100/60">
+          獎項與成就
+        </button>
+      </div>
+
+      <!-- Highlights Grid (Adaptive Columns) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Highlight Item 1 -->
+        <div data-category="award" onclick="openLightbox('【榮譽紀錄】全國工業類學生技藝競賽 金手獎第1名頒獎現場', '經過長年無數晝夜的圖形反覆推演與三維零件繪製訓練，以極致的精度與穩定度摘下全臺榜首金手獎，並技優保送國立臺灣科技大學。', '全國工類技藝競賽電腦機械製圖 金手獎第一名', '獎項與成就', '2020')" class="hl-item bg-[#F7F6F2] rounded-2xl border border-stone-200/90 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col">
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-stone-100 to-amber-100/60 border-b border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden group-hover:bg-amber-50/70 transition-colors">
+            <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:scale-110 transition-transform mb-1.5"></i>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-teal-800 bg-white/80 px-2 py-0.5 rounded">獎項與成就</span>
+            <p class="text-xs font-semibold text-stone-700 mt-2 line-clamp-2 px-2">【榮譽紀錄】全國工類技藝競賽 金手獎第1名頒獎</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-stone-400 font-mono mb-1">
+                <span>2020</span><span class="text-brandTeal font-medium">獎項成就</span>
+              </div>
+              <h4 class="font-serif font-bold text-sm text-brandNavy group-hover:text-brandTeal transition-colors line-clamp-2">
+                全國工類技藝競賽電腦機械製圖 金手獎第一名
+              </h4>
+            </div>
+            <p class="text-xs text-stone-500 mt-2 line-clamp-2">
+              以極致精度與穩定度摘下金手獎第一名，技優保送國立臺灣科技大學。
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlight Item 2 -->
+        <div data-category="award" onclick="openLightbox('【榮譽紀錄】第二屆青志獎頒獎典禮與總統府合影珍藏', '青年志願服務事蹟獲國家級評審肯定，親赴總統府接受總統嘉勉，為偏鄉教育推動留下振奮人心的榮耀印記。', '第二屆青志獎「樂苗新秀獎」暨總統府晉見接見', '獎項與成就', '2025')" class="hl-item bg-[#F7F6F2] rounded-2xl border border-stone-200/90 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col">
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-stone-100 to-amber-100/60 border-b border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden group-hover:bg-amber-50/70 transition-colors">
+            <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:scale-110 transition-transform mb-1.5"></i>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-teal-800 bg-white/80 px-2 py-0.5 rounded">獎項與成就</span>
+            <p class="text-xs font-semibold text-stone-700 mt-2 line-clamp-2 px-2">【榮譽紀錄】第二屆青志獎頒獎典禮與總統接見合影</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-stone-400 font-mono mb-1">
+                <span>2025</span><span class="text-brandTeal font-medium">獎項成就</span>
+              </div>
+              <h4 class="font-serif font-bold text-sm text-brandNavy group-hover:text-brandTeal transition-colors line-clamp-2">
+                第二屆青志獎「樂苗新秀獎」暨總統接見
+              </h4>
+            </div>
+            <p class="text-xs text-stone-500 mt-2 line-clamp-2">
+              教育志願服務榮獲國家級表揚，獲邀進入總統府接受肯定。
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlight Item 3 -->
+        <div data-category="education" onclick="openLightbox('【教育現場】偏鄉學童親手操作切片軟體並等待3D列印成型', '把3D印表機搬到教室走廊，讓偏鄉國小學童親眼看見熔融塑料層層堆疊出自己親手繪製的立體名字吊牌。', '偏鄉孩子的第一堂 3D 列印創客實作課', '教育活動', '2024')" class="hl-item bg-[#F7F6F2] rounded-2xl border border-stone-200/90 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col">
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-stone-100 to-amber-100/60 border-b border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden group-hover:bg-amber-50/70 transition-colors">
+            <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:scale-110 transition-transform mb-1.5"></i>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-teal-800 bg-white/80 px-2 py-0.5 rounded">教育活動</span>
+            <p class="text-xs font-semibold text-stone-700 mt-2 line-clamp-2 px-2">【教育現場】孩子們圍繞在3D印表機前專注觀看</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-stone-400 font-mono mb-1">
+                <span>2024</span><span class="text-brandTeal font-medium">教育活動</span>
+              </div>
+              <h4 class="font-serif font-bold text-sm text-brandNavy group-hover:text-brandTeal transition-colors line-clamp-2">
+                偏鄉孩子的第一堂 3D 列印創客實作課
+              </h4>
+            </div>
+            <p class="text-xs text-stone-500 mt-2 line-clamp-2">
+              將工程切片化為直觀遊戲，啟發學童對三維空間與製造的想像。
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlight Item 4 -->
+        <div data-category="education" onclick="openLightbox('【講座實況】向百名技職學子分享學習歷程與生涯探索投影片', '受邀至高職與大專院校演講，分享技能競賽選手如何轉換視角，將硬技術淬鍊為可轉譯的溝通表達力與社會影響力。', '青年技職生涯探索分享：走出屬於自己的金手之路', '教育活動', '2025')" class="hl-item bg-[#F7F6F2] rounded-2xl border border-stone-200/90 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col">
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-stone-100 to-amber-100/60 border-b border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden group-hover:bg-amber-50/70 transition-colors">
+            <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:scale-110 transition-transform mb-1.5"></i>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-teal-800 bg-white/80 px-2 py-0.5 rounded">教育活動</span>
+            <p class="text-xs font-semibold text-stone-700 mt-2 line-clamp-2 px-2">【講座實況】向百名學子分享學習歷程與生涯探索</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-stone-400 font-mono mb-1">
+                <span>2025</span><span class="text-brandTeal font-medium">教育活動</span>
+              </div>
+              <h4 class="font-serif font-bold text-sm text-brandNavy group-hover:text-brandTeal transition-colors line-clamp-2">
+                青年技職生涯探索：走出金手之路
+              </h4>
+            </div>
+            <p class="text-xs text-stone-500 mt-2 line-clamp-2">
+              拆解技能選手的心態鍛鍊，引導技職青年看見更廣闊的社會舞台。
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlight Item 5 -->
+        <div data-category="community" onclick="openLightbox('【數位培力】長者在新民DOC教室開心展示自己生成的第一張AI圖', '打破科技年齡界線，陪伴名間在地的阿公阿嬤用手機語音輸入關鍵字，生成兒時回憶畫面，現場驚呼與笑聲不斷。', '新民數位機會中心：長輩的生成式 AI 繪圖探索', '地方服務', '2026')" class="hl-item bg-[#F7F6F2] rounded-2xl border border-stone-200/90 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col">
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-stone-100 to-amber-100/60 border-b border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden group-hover:bg-amber-50/70 transition-colors">
+            <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:scale-110 transition-transform mb-1.5"></i>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-teal-800 bg-white/80 px-2 py-0.5 rounded">地方服務</span>
+            <p class="text-xs font-semibold text-stone-700 mt-2 line-clamp-2 px-2">【數位培力】長輩在教室開心展示生成的AI繪圖</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-stone-400 font-mono mb-1">
+                <span>2026</span><span class="text-brandTeal font-medium">地方服務</span>
+              </div>
+              <h4 class="font-serif font-bold text-sm text-brandNavy group-hover:text-brandTeal transition-colors line-clamp-2">
+                長輩的生成式 AI 繪圖與生活探索
+              </h4>
+            </div>
+            <p class="text-xs text-stone-500 mt-2 line-clamp-2">
+              打破年齡界線，陪伴名間在地長輩透過語音與AI科技重現鄉土回憶。
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlight Item 6 -->
+        <div data-category="maker" onclick="openLightbox('【機構原型】親手設計之齒輪箱與機械結構3D列印實體拆解圖', '自行繪製、切片與打印的機構原型，設計卡榫與齒輪傳動結構，提供給學員做為可拆解的實體教具教材。', '高精度 3D 列印機構模組與客製化輔助教具', '創客作品', '2025')" class="hl-item bg-[#F7F6F2] rounded-2xl border border-stone-200/90 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col">
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-stone-100 to-amber-100/60 border-b border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden group-hover:bg-amber-50/70 transition-colors">
+            <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:scale-110 transition-transform mb-1.5"></i>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-teal-800 bg-white/80 px-2 py-0.5 rounded">創客作品</span>
+            <p class="text-xs font-semibold text-stone-700 mt-2 line-clamp-2 px-2">【機構原型】親手設計之齒輪箱與3D列印拆解圖</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-stone-400 font-mono mb-1">
+                <span>2025</span><span class="text-brandTeal font-medium">創客作品</span>
+              </div>
+              <h4 class="font-serif font-bold text-sm text-brandNavy group-hover:text-brandTeal transition-colors line-clamp-2">
+                高精度 3D 列印機構模組與教具
+              </h4>
+            </div>
+            <p class="text-xs text-stone-500 mt-2 line-clamp-2">
+              結合精密配合公差與卡榫工藝，打造可模組化反覆拆裝的教學機構。
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlight Item 7 -->
+        <div data-category="community" onclick="openLightbox('【鄉土踏查】名間茶園空拍視角與田野數位收音訪談側拍', '與在地青年一同踏查茶園、走訪耆老，用空拍鏡頭與數位收音設備留存名間鄉特有的紅土台地人文風貌。', '名間茶香地景訪調與地方文史數位採集', '地方服務', '2026')" class="hl-item bg-[#F7F6F2] rounded-2xl border border-stone-200/90 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col">
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-stone-100 to-amber-100/60 border-b border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden group-hover:bg-amber-50/70 transition-colors">
+            <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:scale-110 transition-transform mb-1.5"></i>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-teal-800 bg-white/80 px-2 py-0.5 rounded">地方服務</span>
+            <p class="text-xs font-semibold text-stone-700 mt-2 line-clamp-2 px-2">【鄉土踏查】名間茶園空拍視角與數位收音側拍</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-stone-400 font-mono mb-1">
+                <span>2026</span><span class="text-brandTeal font-medium">地方服務</span>
+              </div>
+              <h4 class="font-serif font-bold text-sm text-brandNavy group-hover:text-brandTeal transition-colors line-clamp-2">
+                名間茶香地景與地方文史數位採集
+              </h4>
+            </div>
+            <p class="text-xs text-stone-500 mt-2 line-clamp-2">
+              以空拍影像與口述訪談紀錄，典藏名間紅土台地世代傳承的茶香記憶。
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlight Item 8 -->
+        <div data-category="maker" onclick="openLightbox('【教具研發】域見未來全新開源STEAM動手作零件整齊排列平鋪圖', '為「域見未來」全新課程量身打造的極簡木質與3D列印複合結構教具，兼具美感、堅固與平價可複製性。', '開源 STEAM 模組化動手作套件設計', '創客作品', '2026')" class="hl-item bg-[#F7F6F2] rounded-2xl border border-stone-200/90 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col">
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-stone-100 to-amber-100/60 border-b border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden group-hover:bg-amber-50/70 transition-colors">
+            <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:scale-110 transition-transform mb-1.5"></i>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-teal-800 bg-white/80 px-2 py-0.5 rounded">創客作品</span>
+            <p class="text-xs font-semibold text-stone-700 mt-2 line-clamp-2 px-2">【教具研發】域見未來開源STEAM套件零件排列圖</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-stone-400 font-mono mb-1">
+                <span>2026</span><span class="text-brandTeal font-medium">創客作品</span>
+              </div>
+              <h4 class="font-serif font-bold text-sm text-brandNavy group-hover:text-brandTeal transition-colors line-clamp-2">
+                開源 STEAM 模組化動手作套件
+              </h4>
+            </div>
+            <p class="text-xs text-stone-500 mt-2 line-clamp-2">
+              結合雷雕與3D列印複合結構，兼具低門檻與高可塑性的自研教具。
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 07 ｜ LIFE NOTES 生活與興趣 -->
+  <section id="life" class="py-24 bg-[#F7F6F2] border-t border-b border-amber-200/50 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-mono tracking-widest text-amber-800 uppercase font-bold bg-amber-200/60 px-3.5 py-1 rounded-full">
+          SECTION 07 ｜ LIFE NOTES
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-serif font-bold text-brandNavy mt-3">
+          工作之外，也是生活。
+        </h2>
+        <p class="text-stone-600 text-sm sm:text-base mt-2 font-serif italic">
+          「生活中的每一種熱愛，都是認識自己的另一種方式。」
+        </p>
+        <div class="w-12 h-1 bg-brandYellow mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      <!-- Magazine Style Collage Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+        
+        <!-- Note 1: 太鼓 -->
+        <div onclick="openLightbox('【太鼓紀錄】雙手揮動鼓槌揮汗專注打擊大太鼓之沉著身影', '深深著迷於日本太鼓展現的力量感與剛柔並濟。打太鼓需要極致的專注、核心穩定度，以及與身旁夥伴心跳同頻的團隊默契。在汗水淋漓的震撼節奏中，找到了日常高強度思考後的歸零與平靜。', '太鼓之聲 ｜ 節奏與魂', '生活手札・太鼓', '專注力 × 身體共鳴 × 團隊默契')" class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-200 cursor-pointer flex flex-col justify-between group transform -rotate-1 hover:rotate-0">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono tracking-widest text-brandTeal font-bold">TAIKO DRUMMING</span>
+              <span class="text-xs bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full font-serif">節奏與魂</span>
+            </div>
+            <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+              太鼓之聲
+            </h3>
+            <div class="my-3 pl-3 border-l-2 border-brandYellow text-xs sm:text-sm text-stone-600 italic">
+              「每一聲鼓鳴，都是身體、意念與同伴呼吸的合一。」
+            </div>
+            <div class="w-full aspect-[16/11] rounded-2xl bg-gradient-to-br from-amber-50/70 via-stone-100 to-teal-50/50 border border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center my-4 group-hover:bg-amber-100/40 transition-colors">
+              <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:text-amber-700 transition-colors mb-1"></i>
+              <span class="text-[10px] font-mono text-stone-400 uppercase">LIFE PHOTO PLACEHOLDER</span>
+              <p class="text-xs text-stone-700 font-medium mt-1">【太鼓紀錄】雙手揮動鼓槌專注打擊身影</p>
+            </div>
+            <p class="text-xs sm:text-sm text-stone-700 leading-relaxed font-sans">
+              深深著迷於日本太鼓展現的力量感與剛柔並濟。打太鼓需要極致的專注、核心穩定度，以及與身旁夥伴心跳同頻的團隊默契。在震撼節奏中，找到了高強度思考後的歸零。
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-4 mt-4 border-t border-stone-100">
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#專注力</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#身體共鳴</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#團隊默契</span>
+          </div>
+        </div>
+
+        <!-- Note 2: 攝影 -->
+        <div onclick="openLightbox('【攝影作品】名間斜陽光斑散落茶葉與巷弄老磚牆的光影速寫', '喜歡隨身攜帶相機，捕捉午後斜陽穿透林梢的柔光、名間茶園起伏的坡面，以及在活動現場孩子們不假思索的純真笑容。攝影對我而言不是器材技術的比拚，而是一種溫柔凝視世界的練習。', '鏡頭裡的日常溫度 ｜ 光影採集', '生活手札・攝影', '街頭速寫 × 底片光感 × 人像溫度')" class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-200 cursor-pointer flex flex-col justify-between group transform rotate-1 hover:rotate-0">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono tracking-widest text-brandTeal font-bold">PHOTOGRAPHY</span>
+              <span class="text-xs bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full font-serif">光影採集</span>
+            </div>
+            <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+              鏡頭裡的日常溫度
+            </h3>
+            <div class="my-3 pl-3 border-l-2 border-brandYellow text-xs sm:text-sm text-stone-600 italic">
+              「透過觀景窗，重新看見那些被時間遺忘的微小光芒。」
+            </div>
+            <div class="w-full aspect-[16/11] rounded-2xl bg-gradient-to-br from-amber-50/70 via-stone-100 to-teal-50/50 border border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center my-4 group-hover:bg-amber-100/40 transition-colors">
+              <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:text-amber-700 transition-colors mb-1"></i>
+              <span class="text-[10px] font-mono text-stone-400 uppercase">LIFE PHOTO PLACEHOLDER</span>
+              <p class="text-xs text-stone-700 font-medium mt-1">【攝影作品】名間斜陽散落茶園的光影速寫</p>
+            </div>
+            <p class="text-xs sm:text-sm text-stone-700 leading-relaxed font-sans">
+              喜歡隨身攜帶相機，捕捉午後斜陽穿透林梢的柔光、名間茶園起伏的坡面，以及孩子們不假思索的純真笑容。攝影對我而言，是一種溫柔凝視世界的練習。
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-4 mt-4 border-t border-stone-100">
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#街頭速寫</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#底片光感</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#鄉土光景</span>
+          </div>
+        </div>
+
+        <!-- Note 3: 烘焙與料理 -->
+        <div onclick="openLightbox('【料理手作】剛出爐金黃脆皮歐式麵包與手沖咖啡工作台', '做料理和搞工程有著驚人的相似性：溫度、時間、比例與化學變化的精準掌握。在揉捏麵糰與等待麵包緩緩膨起的時光中，體會到耐心帶來的甘甜，並在將點心分送給朋友時獲得純粹快樂。', '烘焙與廚房實驗 ｜ 溫度與發酵', '生活手札・料理', '酸種手揉 × 烤箱溫度 × 分享滋味')" class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-200 cursor-pointer flex flex-col justify-between group transform -rotate-2 hover:rotate-0">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono tracking-widest text-brandTeal font-bold">BAKING & CUISINE</span>
+              <span class="text-xs bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full font-serif">溫度與發酵</span>
+            </div>
+            <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+              烘焙與廚房實驗
+            </h3>
+            <div class="my-3 pl-3 border-l-2 border-brandYellow text-xs sm:text-sm text-stone-600 italic">
+              「享受從秤量每一克粉末到出爐香氣四溢的魔法過程。」
+            </div>
+            <div class="w-full aspect-[16/11] rounded-2xl bg-gradient-to-br from-amber-50/70 via-stone-100 to-teal-50/50 border border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center my-4 group-hover:bg-amber-100/40 transition-colors">
+              <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:text-amber-700 transition-colors mb-1"></i>
+              <span class="text-[10px] font-mono text-stone-400 uppercase">LIFE PHOTO PLACEHOLDER</span>
+              <p class="text-xs text-stone-700 font-medium mt-1">【料理手作】剛出爐脆皮歐式麵包與咖啡台</p>
+            </div>
+            <p class="text-xs sm:text-sm text-stone-700 leading-relaxed font-sans">
+              做料理和搞工程有著驚人的相似性：溫度、時間、比例與化學變化的精準掌握。在揉捏麵糰與等待發酵的時光中，體會耐心帶來的甘甜與分享的純粹快樂。
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-4 mt-4 border-t border-stone-100">
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#手揉麵包</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#溫度掌控</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#分享的滋味</span>
+          </div>
+        </div>
+
+        <!-- Note 4: 音樂 -->
+        <div onclick="openLightbox('【音樂習練】書房窗邊擺放的小提琴木質紋理與中國笛樂譜', '涉獵小提琴的優雅細膩，也接觸中國笛的清脆透亮。不同的樂器代表著完全不同的表達邏輯，就像在技術領域學習不同的程式語言與工程結構，透過音符的起承轉合，讓心靈保有柔軟與敏銳。', '樂音的對話 ｜ 旋律感知', '生活手札・音樂', '小提琴 × 中國笛 × 音律對話')" class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-200 cursor-pointer flex flex-col justify-between group transform rotate-2 hover:rotate-0">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono tracking-widest text-brandTeal font-bold">STRINGS & FLUTE</span>
+              <span class="text-xs bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full font-serif">旋律感知</span>
+            </div>
+            <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+              樂音的對話
+            </h3>
+            <div class="my-3 pl-3 border-l-2 border-brandYellow text-xs sm:text-sm text-stone-600 italic">
+              「琴弓劃過琴弦、氣流吹響竹管，那是不同思維的流動。」
+            </div>
+            <div class="w-full aspect-[16/11] rounded-2xl bg-gradient-to-br from-amber-50/70 via-stone-100 to-teal-50/50 border border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center my-4 group-hover:bg-amber-100/40 transition-colors">
+              <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:text-amber-700 transition-colors mb-1"></i>
+              <span class="text-[10px] font-mono text-stone-400 uppercase">LIFE PHOTO PLACEHOLDER</span>
+              <p class="text-xs text-stone-700 font-medium mt-1">【音樂習練】窗邊擺放的小提琴與中國笛樂譜</p>
+            </div>
+            <p class="text-xs sm:text-sm text-stone-700 leading-relaxed font-sans">
+              涉獵小提琴的細膩，也接觸中國笛的清透。不同樂器有如不同思維系統，透過音符的起承轉合，讓工程師的嚴謹思維中，保有柔軟與對世界的敏銳。
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-4 mt-4 border-t border-stone-100">
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#小提琴</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#中國笛</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#沉靜自我</span>
+          </div>
+        </div>
+
+        <!-- Note 5: 創作與手作 -->
+        <div onclick="openLightbox('【手作工坊】工具整齊掛在洞洞板前之個人造物工作桌全景', '工作是創客教育，休閒時依然熱愛動手造物。喜歡在工作桌上堆滿雷雕木片、自製皮件、3D列印客製零件，享受雙手沾滿木屑或焊錫香氣的午後。對物質結構的觸摸，是我連結現實世界最踏實的途徑。', '手作與造物痴迷 ｜ 動手做', '生活手札・手作', '3D列印打磨 × 原型實驗 × 工具愛好')" class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-200 cursor-pointer flex flex-col justify-between group transform -rotate-1 hover:rotate-0">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono tracking-widest text-brandTeal font-bold">DIGITAL CRAFTING</span>
+              <span class="text-xs bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full font-serif">動手做</span>
+            </div>
+            <h3 class="text-xl font-serif font-bold text-brandNavy group-hover:text-brandTeal transition-colors">
+              手作與造物痴迷
+            </h3>
+            <div class="my-3 pl-3 border-l-2 border-brandYellow text-xs sm:text-sm text-stone-600 italic">
+              「只要能想像出來的形狀，就值得親手把它做出來。」
+            </div>
+            <div class="w-full aspect-[16/11] rounded-2xl bg-gradient-to-br from-amber-50/70 via-stone-100 to-teal-50/50 border border-dashed border-amber-300 p-4 flex flex-col items-center justify-center text-center my-4 group-hover:bg-amber-100/40 transition-colors">
+              <i data-lucide="camera" class="w-6 h-6 text-stone-400 group-hover:text-amber-700 transition-colors mb-1"></i>
+              <span class="text-[10px] font-mono text-stone-400 uppercase">LIFE PHOTO PLACEHOLDER</span>
+              <p class="text-xs text-stone-700 font-medium mt-1">【手作工坊】工具洞洞板前之造物工作桌</p>
+            </div>
+            <p class="text-xs sm:text-sm text-stone-700 leading-relaxed font-sans">
+              工作是創客教育，休閒時依然熱愛造物。享受桌上堆滿雷雕木片、皮革、3D列印客製零件的午後。對物質結構的觸摸，是我連結世界最踏實的方式。
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-4 mt-4 border-t border-stone-100">
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#木工手作</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#原型實驗</span>
+            <span class="text-[11px] text-stone-500 bg-[#F7F6F2] px-2 py-0.5 rounded-md">#造物精神</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 08 ｜ COLLABORATION 講師與合作 -->
+  <section id="collaboration" class="py-24 bg-white relative">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-mono tracking-widest text-brandTeal uppercase font-bold bg-brandTeal/10 px-3 py-1 rounded-full">
+          SECTION 08 ｜ COLLABORATION
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-serif font-bold text-brandNavy mt-3">
+          讓我們一起創造更多可能。
+        </h2>
+        <p class="text-stone-600 text-sm sm:text-base mt-2">
+          歡迎學校、青年組織、社福機構、政府單位與企業夥伴共同攜手。
+        </p>
+        <div class="w-12 h-1 bg-brandYellow mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      <!-- Collaboration Focus List -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
+        <div class="p-5 rounded-2xl bg-[#F7F6F2] border border-stone-200/80 hover:border-amber-300 transition-colors flex items-start gap-3">
+          <div class="p-2 rounded-lg bg-amber-200/60 text-amber-900 shrink-0 mt-0.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-brandNavy text-sm sm:text-base">創客教育與 STEAM 實作課程</h4>
+            <p class="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">針對國小、國中至高中階段，規劃兼具啟發性與動手能力的 3D 列印、數位成形與跨域創客工作坊。</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F7F6F2] border border-stone-200/80 hover:border-amber-300 transition-colors flex items-start gap-3">
+          <div class="p-2 rounded-lg bg-amber-200/60 text-amber-900 shrink-0 mt-0.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-brandNavy text-sm sm:text-base">技職教育推廣與競賽經驗分享</h4>
+            <p class="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">以金手獎選手與學長視角，分享技職學習歷程建立、專案思維培養，以及如何將一技之長發展為多元人生。</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F7F6F2] border border-stone-200/80 hover:border-amber-300 transition-colors flex items-start gap-3">
+          <div class="p-2 rounded-lg bg-amber-200/60 text-amber-900 shrink-0 mt-0.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-brandNavy text-sm sm:text-base">生成式 AI 與數位實用工具應用</h4>
+            <p class="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">專為教師、地方工作者或高齡社區規劃的 AI 實戰與數位工具培力課程，強調即學即用與生活融入。</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F7F6F2] border border-stone-200/80 hover:border-amber-300 transition-colors flex items-start gap-3">
+          <div class="p-2 rounded-lg bg-amber-200/60 text-amber-900 shrink-0 mt-0.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-brandNavy text-sm sm:text-base">青年志願服務與偏鄉教育經驗</h4>
+            <p class="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">剖析志工團隊籌組、教育教案在地化調整，以及青年如何運用自身專業參與公共議題與地方實踐。</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F7F6F2] border border-stone-200/80 hover:border-amber-300 transition-colors flex items-start gap-3 md:col-span-2">
+          <div class="p-2 rounded-lg bg-amber-200/60 text-amber-900 shrink-0 mt-0.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-brandNavy text-sm sm:text-base">地方數位培力與跨領域教育活動</h4>
+            <p class="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">結合鄉土文化、社區特色與科技工具，為在地組織、數位機會中心或社企團隊量身打造專案活動。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel: Resume & Direct Contact -->
+      <div class="bg-gradient-to-r from-amber-50 via-stone-50 to-teal-50 rounded-3xl p-8 border border-amber-200/80 text-center shadow-sm">
+        <h3 class="text-xl sm:text-2xl font-serif font-bold text-brandNavy mb-2">
+          準備好開啟對話了嗎？
+        </h3>
+        <p class="text-xs sm:text-sm text-stone-600 max-w-lg mx-auto mb-6">
+          若您需要演講大綱、教學經歷或更詳盡的個人履歷，歡迎下載講師簡歷，或直接來信討論您的活動規劃。
+        </p>
+
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <!-- Honest Download Behavior: checks config, warns honestly if PDF pending -->
+          <button onclick="handleResumeDownload()" class="px-6 py-3 rounded-xl bg-white border-2 border-stone-300 text-stone-800 font-semibold hover:border-amber-400 hover:bg-amber-50/50 transition-all flex items-center gap-2 shadow-sm text-sm">
+            <i data-lucide="download" class="w-4 h-4 text-amber-600"></i>
+            <span>下載講師簡歷 (PDF)</span>
+          </button>
+
+          <!-- Email Inquiry Button -->
+          <a href="mailto:yus0592@gmail.com?subject=【合作邀約】來自廖佑軒個人網站的諮詢" class="px-7 py-3 rounded-xl bg-brandNavy text-white font-semibold hover:bg-brandTeal transition-all flex items-center gap-2 shadow-md text-sm">
+            <i data-lucide="mail" class="w-4 h-4 text-brandYellow"></i>
+            <span>合作邀約（開啟 Email）</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 09 ｜ CONTACT 聯絡我 -->
+  <section id="contact" class="py-24 bg-brandNavy text-white relative">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+      
+      <span class="text-xs font-mono tracking-widest text-brandTeal uppercase font-bold bg-white/10 px-3.5 py-1.5 rounded-full">
+        SECTION 09 ｜ CONTACT
+      </span>
+
+      <h2 class="text-3xl sm:text-5xl font-serif font-bold tracking-tight text-white">
+        期待與你相遇。
+      </h2>
+
+      <p class="text-stone-300 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
+        無論是教育合作、課程邀約、專案交流，或是想分享彼此在技職、地方與生活中的故事，都十分歡迎與我聯繫。
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+        <!-- Email Mailto Action -->
+        <a href="mailto:yus0592@gmail.com" class="px-6 py-3.5 rounded-xl bg-brandYellow text-brandNavy font-bold hover:bg-amber-300 transition-all flex items-center gap-2.5 shadow-lg group">
+          <i data-lucide="mail" class="w-5 h-5 text-brandNavy"></i>
+          <span>yus0592@gmail.com</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5 opacity-60 group-hover:opacity-100"></i>
+        </a>
+
+        <!-- Instagram External Action -->
+        <a href="https://www.instagram.com/yus_0215" target="_blank" rel="noopener noreferrer" class="px-6 py-3.5 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 border border-white/20 transition-all flex items-center gap-2.5 backdrop-blur-sm group">
+          <i data-lucide="instagram" class="w-5 h-5 text-brandYellow"></i>
+          <span>Instagram (@yus_0215)</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5 opacity-60 group-hover:opacity-100"></i>
+        </a>
+      </div>
+
+      <!-- Footer Divider & Copyright -->
+      <div class="pt-16 mt-16 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-400 gap-4">
+        <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+          <span class="font-serif font-bold text-white tracking-widest">
+            LIAO YOU-XUAN
+          </span>
+          <span class="hidden sm:inline">|</span>
+          <span class="text-brandYellow">以技為本，以人為念。</span>
+        </div>
+        <div>
+          © 2026 LIAO YOU-XUAN. All Rights Reserved.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- JavaScript Interactions & State Handling -->
+  <script>
+    // Configuration object
+    const SITE_CONFIG = {
+      resumePdfPath: "" // 預留真實 PDF 路徑，例如 "/assets/Liao_You_Xuan_Resume.pdf"
+    };
+
+    // Initialize Lucide vector icons
+    lucide.createIcons();
+
+    // Mobile Navigation Drawer Toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      const isHidden = menu.classList.contains('hidden');
+      if (isHidden) {
+        menu.classList.remove('hidden');
+      } else {
+        menu.classList.add('hidden');
+      }
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobile-menu').classList.add('hidden');
+    }
+
+    // Scroll to Top visibility detection
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('back-to-top');
+      if (window.scrollY > 400) {
+        btn.classList.remove('hidden');
+      } else {
+        btn.classList.add('hidden');
+      }
+    }, { passive: true });
+
+    // Toast message trigger (Replaces alert)
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const msgElem = document.getElementById('toast-message');
+      msgElem.textContent = message;
+      toast.classList.remove('hidden');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        hideToast();
+      }, 4000);
+    }
+    function hideToast() {
+      document.getElementById('toast').classList.add('hidden');
+    }
+
+    // Resume Download Handler
+    function handleResumeDownload() {
+      if (SITE_CONFIG.resumePdfPath && SITE_CONFIG.resumePdfPath.trim() !== "") {
+        const link = document.createElement('a');
+        link.href = SITE_CONFIG.resumePdfPath;
+        link.download = "廖佑軒_講師簡歷.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("已開始下載講師完整簡歷！");
+      } else {
+        showToast("「講師簡歷 PDF」檔案正在整理排版中，即將更新上架。若需演講授課大綱，歡迎直接點擊寄信聯繫！");
+      }
+    }
+
+    // Project Details Accordion Toggle
+    function toggleProject(id) {
+      const detail = document.getElementById(`project-detail-${id}`);
+      const btnText = document.getElementById(`proj-btn-text-${id}`);
+      const icon = document.getElementById(`proj-icon-${id}`);
+      const isHidden = detail.classList.contains('hidden');
+
+      if (isHidden) {
+        detail.classList.remove('hidden');
+        btnText.textContent = "收起專案細節";
+        icon.classList.add('rotate-180');
+      } else {
+        detail.classList.add('hidden');
+        btnText.textContent = "查看更多專案面向與成果";
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Highlights Filter Function
+    function filterHighlights(category, btnElement) {
+      // Update button active styling
+      document.querySelectorAll('.hl-filter-btn').forEach(btn => {
+        btn.className = "hl-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all bg-[#F7F6F2] text-stone-600 hover:bg-amber-100/60";
+      });
+      btnElement.className = "hl-filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all bg-brandNavy text-white shadow-sm";
+
+      // Filter grid items
+      const items = document.querySelectorAll('.hl-item');
+      items.forEach(item => {
+        if (category === 'all' || item.getAttribute('data-category') === category) {
+          item.classList.remove('hidden');
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+    }
+
+    // Lightbox modal controls
+    function openLightbox(placeholderText, desc, title, badge, date, tagsStr = "") {
+      document.getElementById('lightbox-placeholder-text').textContent = placeholderText;
+      document.getElementById('lightbox-title').textContent = title;
+      document.getElementById('lightbox-desc').textContent = desc;
+      document.getElementById('lightbox-badge').textContent = badge;
+      document.getElementById('lightbox-date').textContent = date;
+
+      const tagsContainer = document.getElementById('lightbox-tags');
+      tagsContainer.innerHTML = '';
+      if (tagsStr) {
+        tagsStr.split('×').forEach(t => {
+          const span = document.createElement('span');
+          span.className = "text-xs bg-white text-stone-600 px-2.5 py-1 rounded-md border border-stone-200";
+          span.textContent = `#${t.trim()}`;
+          tagsContainer.appendChild(span);
+        });
+      }
+
+      document.body.style.overflow = 'hidden';
+      document.getElementById('lightbox-modal').classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      document.body.style.overflow = '';
+      document.getElementById('lightbox-modal').classList.add('hidden');
+    }
+
+    // Close lightbox on Escape key or backdrop click
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+    document.getElementById('lightbox-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'lightbox-modal') closeLightbox();
+    });
+  </script>
+</body>
+</html>
