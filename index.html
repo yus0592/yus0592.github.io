@@ -217,13 +217,10 @@ function articleShareUrl(route=page,id=current){
  return url.href;
 }
 function articleShareButtons(title,route,id){
- const url=articleShareUrl(route,id),text=encodeURIComponent(title),encoded=encodeURIComponent(url);
+ const url=articleShareUrl(route,id);
  return `<section class="article-sharing" aria-label="分享文章">
  <h3>分享這篇文章</h3><div class="q-toolbar">
  <button type="button" class="btn secondary" onclick="shareArticle()">手機分享</button>
- <a class="btn secondary" href="https://social-plugins.line.me/lineit/share?url=${encoded}" target="_blank" rel="noopener noreferrer">LINE</a>
- <a class="btn secondary" href="https://www.facebook.com/sharer/sharer.php?u=${encoded}" target="_blank" rel="noopener noreferrer">Facebook</a>
- <a class="btn secondary" href="https://www.threads.net/intent/post?text=${text}%20${encoded}" target="_blank" rel="noopener noreferrer">Threads（脆）</a>
  <button type="button" class="btn secondary" onclick="downloadArticleStory(this)">下載 IG 限動圖</button>
  <button type="button" class="btn secondary" onclick="copyArticleLink()">複製連結</button></div>
  <p class="muted">分享到 IG 時，可上傳限動圖，再用連結貼紙貼上文章網址。</p>
